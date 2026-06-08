@@ -59,7 +59,7 @@ struct ImageCharacterView: View {
         }
     }
 
-    /// Map (action, mood) to a logical sprite state — a trivial 1:1 lookup now that
+    /// Map (action, mood) to a logical sprite state - a trivial 1:1 lookup now that
     /// each `Action`/`Emotion` carries its own `sprite`. No more collapsing several
     /// actions onto one picture.
     private var logicalState: String {
@@ -81,7 +81,7 @@ struct ImageCharacterView: View {
     }
 
     /// When `hairOnFire` is set, swap a locomotion cycle for its baked fire variant
-    /// (`walkfire`/`runfire`) so he runs with real rendered flames — falling back to
+    /// (`walkfire`/`runfire`) so he runs with real rendered flames - falling back to
     /// the plain cycle if the fire sprites aren't bundled.
     private func fireVariant(_ base: String) -> String {
         guard emotions.hairOnFire else { return base }
@@ -95,7 +95,7 @@ struct ImageCharacterView: View {
     private struct Motion { var dx: CGFloat = 0, dy: CGFloat = 0, rot: Double = 0
                             var sx: CGFloat = 1, sy: CGFloat = 1 }
 
-    /// Exaggerated, cartoon motion per action so each reads distinctly in flight —
+    /// Exaggerated, cartoon motion per action so each reads distinctly in flight -
     /// panic shakes, jump arcs, celebrate bounces, on-fire jitters, run leans in.
     private func motion(for a: Action, emotion e: Emotion, t: TimeInterval, state: String) -> Motion {
         var m = Motion()

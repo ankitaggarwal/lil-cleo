@@ -36,16 +36,16 @@ os.makedirs(OUT, exist_ok=True)
 # .blend is skipped automatically, so you can render incrementally as you author.
 # Front EMOTION/POSE stills (single frame each).
 FRONT = [
-    # Tier 0 — core (mandatory)
+    # Tier 0 - core (mandatory)
     "hero", "happy", "excited", "sad", "thinking", "curious", "sleeping",
     "sit", "point",
-    # Tier 1 — extended emotions
+    # Tier 1 - extended emotions
     "neutral", "smiling", "laughing", "angry", "surprised", "confused",
     "proud", "nervous", "bored", "love", "crying", "embarrassed",
     "determined", "smug", "scared", "relieved",
-    # Tier 2 — gesture stills
+    # Tier 2 - gesture stills
     "thumbsup", "facepalm", "shrug", "bow", "yawn", "peace", "salute",
-    # Tier 4 — prop & effect "story" states
+    # Tier 4 - prop & effect "story" states
     "coffee", "idea", "debug", "fixing", "trophy", "party",
     "raincloud", "headphones", "reading", "coding", "glitch", "loading",
     "sweating", "meditate", "clipboard",

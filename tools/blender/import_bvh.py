@@ -11,7 +11,7 @@ Brick has only 7 bones (root/spine/head/armL/armR/legL/legR) so this is an
 *approximate* retarget: for each mapped bone we copy the source pose-bone's
 LOCAL rotation delta (matrix_basis) per frame, run it through a per-bone axis
 remap into Brick's documented convention, and keyframe it. The defaults below
-are a sane starting point — calibrate AXIS_REMAP / SRC_BONES for your BVH source
+are a sane starting point - calibrate AXIS_REMAP / SRC_BONES for your BVH source
 (naming and rest pose vary), then re-run.
 
 Brick bone-local rotation convention (from animate.py):
@@ -134,7 +134,7 @@ def main():
 
     brick = bpy.data.objects.get("Brick")
     if not brick or brick.type != "ARMATURE":
-        print("ERROR: no 'Brick' armature in this .blend — open brick.blend"); return
+        print("ERROR: no 'Brick' armature in this .blend - open brick.blend"); return
 
     if o["map"]:
         cfg = json.loads(o["map"]) if o["map"].strip().startswith("{") \
@@ -153,7 +153,7 @@ def main():
     missing = [b for b in SRC_BONES if b not in bmap]
     print(f"mapped {len(bmap)}/{len(SRC_BONES)} bones: {bmap}")
     if missing:
-        print(f"  WARN unmapped (left at rest): {missing} — "
+        print(f"  WARN unmapped (left at rest): {missing} - "
               f"source bones are {[b.name for b in src.pose.bones][:12]}...")
 
     sc = bpy.context.scene

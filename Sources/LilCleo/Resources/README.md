@@ -29,5 +29,5 @@ Faces are swappable face-print objects in the rig (neutral/happy/sad/angry/
 surprised/sleepy/love/thinking/curious/worried/dead/wink/laughing); which face +
 props each state uses is data in `tools/blender/brick_states.py`.
 
-These PNGs are generated from a Blender rig — see `tools/blender/` and the repo
+These PNGs are generated from a Blender rig - see `tools/blender/` and the repo
 root `CLAUDE.md` for the pipeline (`make brick`).

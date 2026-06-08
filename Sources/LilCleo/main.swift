@@ -15,7 +15,7 @@ if let act = ProcessInfo.processInfo.environment["CLEO_STRIP"], let a = Action(r
     exit(ok ? 0 : 1)
 }
 // CLEO_SPRITE_GIF=<file> renders the bundled sprite walk cycle for CLEO_CHARACTER
-// (default brick) to an animated GIF — verifies sprite bundling + in-app cycling.
+// (default brick) to an animated GIF - verifies sprite bundling + in-app cycling.
 if let out = ProcessInfo.processInfo.environment["CLEO_SPRITE_GIF"] {
     let char = ProcessInfo.processInfo.environment["CLEO_CHARACTER"] ?? "brick"
     let ok = MainActor.assumeIsolated {
@@ -58,7 +58,7 @@ let app = NSApplication.shared
 // The delegate is main-actor isolated; top-level code runs on the main thread.
 let delegate = MainActor.assumeIsolated { AppDelegate() }
 app.delegate = delegate
-// Accessory: no dock icon, no menu bar app menu — Cleo lives in the dock area
+// Accessory: no dock icon, no menu bar app menu - Cleo lives in the dock area
 // and is controlled from her status-bar item.
 app.setActivationPolicy(.accessory)
 app.run()

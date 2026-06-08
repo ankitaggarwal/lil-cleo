@@ -7,7 +7,7 @@ import IOKit.ps
 /// Watches real macOS signals and nudges Brick to react with a face + bubble, so he
 /// gives the user small ambient cues about what the machine is doing. Everything
 /// here uses only system frameworks (Mach host stats, IOKit power sources, Network,
-/// CoreGraphics, Dispatch) — no third-party deps, matching the project rule.
+/// CoreGraphics, Dispatch) - no third-party deps, matching the project rule.
 ///
 /// Reactions fire on **threshold crossings** (rising/falling edges), not every tick,
 /// so Brick nudges once when something changes rather than nagging continuously.
@@ -28,7 +28,7 @@ final class SystemMonitor {
     private var cpuHotStreak = 0
     private var cpuHot = false
     // RAM pressure decays instead of latching: a warning/critical event keeps it
-    // "pressured" only while fresh events keep arriving. We can't poll for recovery —
+    // "pressured" only while fresh events keep arriving. We can't poll for recovery -
     // `kern…vm_pressure_level` stays at "warning" for minutes as the compressor drains
     // slowly, so a level poll would pin Brick on fire long after the load is gone.
     private static let memHold: TimeInterval = 30
@@ -97,7 +97,7 @@ final class SystemMonitor {
         checkTime()
     }
 
-    // MARK: CPU — sustained high load reads as "working hard / heating up"
+    // MARK: CPU - sustained high load reads as "working hard / heating up"
 
     private func checkCPU() {
         guard let usage = cpuUsage() else { return }
@@ -107,7 +107,7 @@ final class SystemMonitor {
         evaluateOverload()
     }
 
-    // MARK: Overload — CPU and/or RAM pegged: run on fire until *both* recover
+    // MARK: Overload - CPU and/or RAM pegged: run on fire until *both* recover
 
     /// Single source of truth for the "running on fire" state, fed by both the CPU
     /// poll and the (event-driven) memory-pressure handler. Brick ignites on the
@@ -126,16 +126,16 @@ final class SystemMonitor {
             }
         } else if onFire {
             onFire = false
-            engine.endEmergency(message: "phew — back to normal 😮‍💨")
+            engine.endEmergency(message: "phew - back to normal 😮‍💨")
         }
     }
 
     /// Bubble copy describing *what* is on fire (CPU, RAM, or both).
     private func overloadMessage() -> String {
         switch (cpuHot, memPressured) {
-        case (true, true):  return "CPU \(lastCPUPct)% & RAM maxed — 🔥🔥"
-        case (true, false): return "CPU's slammed — \(lastCPUPct)% 🔥"
-        default:            return "memory's maxed out — 🔥"
+        case (true, true):  return "CPU \(lastCPUPct)% & RAM maxed - 🔥🔥"
+        case (true, false): return "CPU's slammed - \(lastCPUPct)% 🔥"
+        default:            return "memory's maxed out - 🔥"
         }
     }
 
@@ -159,14 +159,14 @@ final class SystemMonitor {
         return (user + sys + nice) / total
     }
 
-    // MARK: Thermal — serious/critical = literally on fire
+    // MARK: Thermal - serious/critical = literally on fire
 
     private func checkThermal() {
         let state = ProcessInfo.processInfo.thermalState
         let hot = (state == .serious || state == .critical)
         if hot && !thermalHot {
             let level = (state == .critical) ? "critical" : "serious"
-            engine.react(.error, message: "overheating — thermal is \(level)! 🔥")
+            engine.react(.error, message: "overheating - thermal is \(level)! 🔥")
         } else if !hot && thermalHot {
             engine.trigger(emotion: .relieved, message: "phew, cooled off 😮‍💨", hold: 2.0, intensity: .info)
         }
@@ -180,7 +180,7 @@ final class SystemMonitor {
         let low = (pct <= 15 && !charging)
         if low && !batteryLow {
             engine.trigger(emotion: .tired, action: .yawn,
-                           message: "battery low — \(pct)% 🔋", hold: 3.5, intensity: .alert)
+                           message: "battery low - \(pct)% 🔋", hold: 3.5, intensity: .alert)
         } else if !low && batteryLow && charging {
             engine.trigger(emotion: .relieved, action: .coffee,
                            message: "ah, plugged in ⚡️", hold: 2.5, intensity: .info)
@@ -213,7 +213,7 @@ final class SystemMonitor {
         let low = gb < 5
         if low && !diskLow {
             engine.trigger(emotion: .nervous, action: .raincloud,
-                           message: "low on disk — \(String(format: "%.1f", gb)) GB left 💾",
+                           message: "low on disk - \(String(format: "%.1f", gb)) GB left 💾",
                            hold: 3.0, intensity: .alert)
         }
         diskLow = low
@@ -247,7 +247,7 @@ final class SystemMonitor {
         netDown = down
     }
 
-    // MARK: Idle — wave to get attention when the user's been gone a while
+    // MARK: Idle - wave to get attention when the user's been gone a while
 
     private func checkIdle() {
         let any = CGEventType(rawValue: ~0)!     // kCGAnyInputEventType
@@ -260,7 +260,7 @@ final class SystemMonitor {
         idleDeep = deep          // re-arms when the user comes back (idle resets)
     }
 
-    // MARK: Time of day — a gentle late-night "go rest" nudge, once per night
+    // MARK: Time of day - a gentle late-night "go rest" nudge, once per night
 
     private func checkTime() {
         let cal = Calendar.current
@@ -271,7 +271,7 @@ final class SystemMonitor {
         if lateNight && lateNightDay != day {
             lateNightDay = day   // once per calendar day; re-arms automatically tomorrow
             engine.trigger(emotion: .tired, action: .coffee,
-                           message: "it's late — maybe rest? 😴", hold: 3.5, intensity: .info)
+                           message: "it's late - maybe rest? 😴", hold: 3.5, intensity: .info)
         }
     }
 }

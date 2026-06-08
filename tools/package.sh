@@ -14,7 +14,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 APP_NAME="LilCleo"
-VERSION="${LILCLEO_VERSION:-1.0.0}"
+VERSION="${LILCLEO_VERSION:-1.1.0}"
 BUNDLE_ID="com.curious.lilcleo"
 DIST="dist"
 APP="$DIST/$APP_NAME.app"

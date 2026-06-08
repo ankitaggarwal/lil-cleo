@@ -1,7 +1,7 @@
 import AppKit
 
 /// Checks GitHub for the latest release and, if it's newer than this build, offers a
-/// direct download. Dependency-free (just `URLSession`), works with ad-hoc signing —
+/// direct download. Dependency-free (just `URLSession`), works with ad-hoc signing -
 /// the same lightweight approach as the sibling CopyStack app. Runs on launch + once
 /// a day; a "Check for Updates…" menu item triggers a manual (non-silent) check.
 enum UpdateChecker {

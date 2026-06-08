@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// A small cartoon speech bubble that floats above Brick to narrate what just
-/// happened ("battery low — 12% 🔋"). The copy comes from `EmotionEngine.message`,
+/// happened ("battery low - 12% 🔋"). The copy comes from `EmotionEngine.message`,
 /// set by reactions; this view just shows/hides it with a springy pop. Lives in its
 /// own borderless overlay window managed by `AppDelegate` so it can overflow the
 /// narrow character window.
@@ -22,8 +22,8 @@ struct SpeechBubbleHost: View {
 }
 
 /// The bubble itself: a soft, frosted card with a small downward tail. Styled to
-/// feel like a native macOS popover — translucent material, hairline border, light
-/// shadow — rather than a loud comic balloon, and it sits a little above Brick so
+/// feel like a native macOS popover - translucent material, hairline border, light
+/// shadow - rather than a loud comic balloon, and it sits a little above Brick so
 /// it never overlaps him.
 struct SpeechBubble: View {
     let text: String

@@ -37,7 +37,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // Wander state: Brick strolls along the dock when he's in the mood.
     var wanderTimer: Timer?
     var walkDir: CGFloat = 1          // +1 right, -1 left
-    var panicDir: CGFloat = 1         // +1 right, -1 left — direction of the on-fire run
+    var panicDir: CGFloat = 1         // +1 right, -1 left - direction of the on-fire run
     var pauseFrames = 0               // >0 means standing still
     var walkSpeed: CGFloat { 1.1 * CGFloat(settings.scale) }
 
@@ -125,7 +125,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         sizeRoot.submenu = sizeMenu
         menu.addItem(sizeRoot)
 
-        // Character switcher — only when more than one ships.
+        // Character switcher - only when more than one ships.
         if Settings.characters.count > 1 {
             let charMenu = NSMenu()
             for c in Settings.characters {
@@ -205,7 +205,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     /// Center the bubble window above Brick, floating clearly above his head (the
-    /// tail points down toward him with a comfortable gap — no overlap).
+    /// tail points down toward him with a comfortable gap - no overlap).
     func positionBubble() {
         guard let cw = characterWindow, let bw = bubbleWindow else { return }
         let cf = cw.frame

@@ -12,7 +12,7 @@ dist/
 # Secrets (never commit)
 .env
 
-# Local agent / dev tooling — not part of the project, never published
+# Local agent / dev tooling - not part of the project, never published
 CLAUDE.md
 CLAUDE.local.md
 .mcp.json

@@ -53,14 +53,14 @@ extension AppDelegate {
     // MARK: The script
     //
     // A natural "day in the life": he mostly just pads around quietly (no speech),
-    // rests in a corner, wanders again — and only *speaks up* when something real
+    // rests in a corner, wanders again - and only *speaks up* when something real
     // happens on the machine (CPU spike, memory filling), worries for a while, then
     // calms down as it recovers. Movement eases in/out and he stands before he sits.
 
     private func runReel() async {
         emotions.facing = 1
 
-        // 1. Just strolling around for a while — quiet, no bubble (~12s).
+        // 1. Just strolling around for a while - quiet, no bubble (~12s).
         await settle(0.4)
         await filmStroll(seconds: 12)
         await settle(0.6)
@@ -74,7 +74,7 @@ extension AppDelegate {
         await filmStroll(seconds: 3)
         await settle(0.7)
 
-        // 4. Memory starts climbing — first a wary glance…
+        // 4. Memory starts climbing - first a wary glance…
         emotions.perform(.sweating, emotion: .nervous, for: 2.6, message: "memory's creeping up… 📈")
         await beat(2.6)
 
@@ -82,7 +82,7 @@ extension AppDelegate {
         emotions.perform(.panic, emotion: .scared, for: 2.6, message: "RAM at 88% 😬")
         await beat(2.6)
 
-        // 6. It boils over — hair on fire — then he bolts across the screen ablaze.
+        // 6. It boils over - hair on fire - then he bolts across the screen ablaze.
         emotions.hairOnFire = true
         emotions.perform(.onFire, emotion: .scared, for: 1.8, message: "🔥 it's overheating! 🔥")
         await beat(1.8)

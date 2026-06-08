@@ -4,7 +4,7 @@ import Combine
 /// The emotional repertoire Brick can express. This enum is the *renderer-agnostic*
 /// contract: each case maps to a front sprite (`happy.png`, …) for the illustrated
 /// character and to face traits for the SwiftUI vector fallback. Every case must
-/// read instantly at thumbnail size and carry its own face — no two should look
+/// read instantly at thumbnail size and carry its own face - no two should look
 /// alike. Add a case here + a face in `tools/blender/props.py` to grow the set.
 enum Emotion: String, CaseIterable, Identifiable {
     case idle        // calm, gentle breathing
@@ -248,7 +248,7 @@ enum Action: String, CaseIterable, Identifiable {
     case panic
     case celebrate
     case cheer
-    case shake        // frustrated shimmy — "blocked / stuck"
+    case shake        // frustrated shimmy - "blocked / stuck"
 
     // Gestures & reactions
     case clap
@@ -265,7 +265,7 @@ enum Action: String, CaseIterable, Identifiable {
     case thumbsup
 
     // "Story" prop / effect poses
-    case onFire       // hair on fire — overwhelmed / overheating
+    case onFire       // hair on fire - overwhelmed / overheating
     case coffee
     case idea
     case debug
@@ -421,7 +421,7 @@ enum Action: String, CaseIterable, Identifiable {
 // MARK: - Reaction intensity
 
 /// How insistent a reaction is. Higher intensities can't be stomped by lower ones
-/// while they're on screen — so a "hair on fire" alert isn't interrupted by an
+/// while they're on screen - so a "hair on fire" alert isn't interrupted by an
 /// ambient idle fidget.
 enum Intensity: Int, Comparable {
     case ambient = 0   // idle fidgets, drifting to sleep
@@ -511,16 +511,16 @@ final class EmotionEngine: ObservableObject {
     @Published private(set) var action: Action = .idle
 
     /// A short line shown in the speech bubble, or nil to hide it. Set by reactions
-    /// so the user gets context ("battery low — 12% 🔋").
+    /// so the user gets context ("battery low - 12% 🔋").
     @Published private(set) var message: String?
 
-    /// Timestamp of the last real reaction (event/system/poke — anything routed
+    /// Timestamp of the last real reaction (event/system/poke - anything routed
     /// through `trigger`). The wander controller watches this to wake Brick from a
     /// corner nap when something actually happens.
     @Published private(set) var lastReactionAt: Date?
 
     /// When true, the renderer overlays flames on his head regardless of the current
-    /// sprite — so he can, say, *run* with his hair on fire (demo reel).
+    /// sprite - so he can, say, *run* with his hair on fire (demo reel).
     @Published var hairOnFire = false
 
     /// True while the machine is overloaded (CPU and/or RAM pegged). Brick bolts
@@ -533,11 +533,11 @@ final class EmotionEngine: ObservableObject {
     @Published var isWalking = false
     @Published var facing: CGFloat = 1   // +1 faces right, -1 faces left
 
-    // MARK: Personality — a lightweight "alive over the workday" model.
+    // MARK: Personality - a lightweight "alive over the workday" model.
     /// 0 (exhausted) … 1 (energized). Drains with work, recovers on breaks.
     @Published private(set) var energy: Double = 0.7
 
-    /// Blink slows when tired — read by the renderer to scale blink cadence.
+    /// Blink slows when tired - read by the renderer to scale blink cadence.
     var blinkMultiplier: Double { 1.5 - 0.7 * energy }   // 0.8 (fresh) … 1.5 (tired)
 
     /// Whether Brick is allowed to stroll. He holds still during rooted actions
@@ -628,7 +628,7 @@ final class EmotionEngine: ObservableObject {
         }
     }
 
-    /// Nudge from user interaction (hover, tap) — perks Brick up.
+    /// Nudge from user interaction (hover, tap) - perks Brick up.
     func poke() { trigger(emotion: .curious, message: nil, hold: 1.6, intensity: .info) }
 
     /// Settle into a still resting pose (sit/sleep) without the one-shot gesture
@@ -786,7 +786,7 @@ final class EmotionEngine: ObservableObject {
         case .error:
             nudge(energy: -0.2); trigger(emotion: .scared, action: .onFire, message: "everything's on fire! 🔥", hold: 3.0, intensity: .critical)
         case .attention:
-            trigger(emotion: .curious, action: .wave, message: "psst — over here! 👋", hold: 2.0, intensity: .info)
+            trigger(emotion: .curious, action: .wave, message: "psst - over here! 👋", hold: 2.0, intensity: .info)
         case .prMerged:
             nudge(energy: 0.1); trigger(emotion: .proud, action: .trophy, message: "PR merged! 🏆", hold: 2.4, intensity: .alert)
         case .gitPushed:

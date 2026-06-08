@@ -1,11 +1,11 @@
-"""Build Brick — the LEGO-minifigure mascot — from scratch in Blender, headless.
+"""Build Brick - the LEGO-minifigure mascot - from scratch in Blender, headless.
 
     /Applications/Blender.app/Contents/MacOS/Blender -b -P blender/build_brick.py
 
 Models the character on-model per BRICK.md (palette from the actual
 reference/sprites/hero.png: yellow head+hands, teal jacket+arms, brown swept
 hair, BLUE legs, RED feet, black face print), rigs him with a minifig armature
-(rigid bone-parented parts — the correct, LEGO-accurate deformation style),
+(rigid bone-parented parts - the correct, LEGO-accurate deformation style),
 builds swappable faces + Tier-4 props/effects (props.py), bakes a front camera
 + 3-point light rig, authors every animation/pose Action (animate.py), and
 saves blender/work/brick.blend.

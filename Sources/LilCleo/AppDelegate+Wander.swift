@@ -4,7 +4,7 @@ import ApplicationServices
 /// The dock-stroll behavior: an activity state machine that walks Brick along the
 /// dock, rests him quietly in a corner after a while, and wakes him to react when
 /// something happens. Window movement is tracked in `brickX` (sub-pixel) because
-/// `NSWindow` origins are pixel-rounded — accumulating there is what lets slow steps
+/// `NSWindow` origins are pixel-rounded - accumulating there is what lets slow steps
 /// add up instead of rounding away to nothing.
 extension AppDelegate {
     func startWandering() {
@@ -42,7 +42,7 @@ extension AppDelegate {
         }
 
         // Any real reaction interrupts what he's doing: stop, turn front, and emote
-        // (a mood face only shows from the front — while walking he's in profile).
+        // (a mood face only shows from the front - while walking he's in profile).
         if let t = emotions.lastReactionAt, t != lastReactionSeen {
             lastReactionSeen = t
             emotions.wake()
@@ -84,7 +84,7 @@ extension AppDelegate {
 
         case .resting:
             emotions.setLocomotion(walking: false)
-            // Sit first, then drift to sleep after a bit — quiet, do-not-disturb.
+            // Sit first, then drift to sleep after a bit - quiet, do-not-disturb.
             if emotions.action == .sit, Date().timeIntervalSince(restStartedAt) > 14 {
                 emotions.rest(.sleep)
             }
@@ -142,7 +142,7 @@ extension AppDelegate {
 
     /// Horizontal limits Brick paces between. Prefer the exact Dock icon-strip
     /// (needs Accessibility). Without it, fall back to a **centered band** roughly
-    /// over the Dock — NOT the whole screen — so he never strays out to the edges
+    /// over the Dock - NOT the whole screen - so he never strays out to the edges
     /// (and so "go to a corner" parks him by the Dock, not at the screen edge).
     func walkBounds(screen: NSScreen, width: CGFloat) -> (CGFloat, CGFloat) {
         if let r = dockPillXRange() {
@@ -160,7 +160,7 @@ extension AppDelegate {
 
     /// The centered dock icon strip's x-range, via the Accessibility API. Returns
     /// nil if the app isn't trusted for Accessibility (then we fall back to the
-    /// full screen width) — grant it in System Settings ▸ Privacy ▸ Accessibility
+    /// full screen width) - grant it in System Settings ▸ Privacy ▸ Accessibility
     /// to make Brick hug the dock. Cached and refreshed every ~2s.
     func dockPillXRange() -> ClosedRange<CGFloat>? {
         if Date().timeIntervalSince(dockProbedAt) < 2 { return dockRange }

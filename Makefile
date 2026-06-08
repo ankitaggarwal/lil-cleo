@@ -1,4 +1,4 @@
-# LilCleo — common tasks. Run `make help` for the list.
+# LilCleo - common tasks. Run `make help` for the list.
 
 BLENDER ?= /Applications/Blender.app/Contents/MacOS/Blender
 SHELL   := /bin/zsh

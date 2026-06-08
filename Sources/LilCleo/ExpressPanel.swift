@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// A small, Apple-style picker for triggering any of Brick's moods, actions, or
-/// event reactions — a search field over an emoji grid, so the full repertoire is
+/// event reactions - a search field over an emoji grid, so the full repertoire is
 /// reachable without a 60-row menu. Hosted in a floating panel by `AppDelegate`.
 struct ExpressView: View {
     var onEmotion: (Emotion) -> Void
@@ -166,7 +166,7 @@ struct ExpressView: View {
     }
 }
 
-/// Soft rounded highlight on hover/press — feels like the native emoji picker.
+/// Soft rounded highlight on hover/press - feels like the native emoji picker.
 private struct EmojiButtonStyle: ButtonStyle {
     @State private var hover = false
     func makeBody(configuration: Configuration) -> some View {

@@ -33,9 +33,9 @@ struct GalleryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Cleo — Actions").font(.system(size: 18, weight: .bold, design: .rounded))
+            Text("Cleo - Actions").font(.system(size: 18, weight: .bold, design: .rounded))
             grid(actionCells)
-            Text("Cleo — Emotions (idle pose)").font(.system(size: 18, weight: .bold, design: .rounded))
+            Text("Cleo - Emotions (idle pose)").font(.system(size: 18, weight: .bold, design: .rounded))
             grid(emotionCells)
         }
         .padding(20)
@@ -68,7 +68,7 @@ struct GalleryView: View {
     }
 }
 
-/// A horizontal film strip of one action sampled across its cycle — lets us
+/// A horizontal film strip of one action sampled across its cycle - lets us
 /// verify motion (e.g. a walk cycle) in a single still.
 struct StripView: View {
     var action: Action

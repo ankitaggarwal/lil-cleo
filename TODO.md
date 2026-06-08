@@ -2,7 +2,7 @@
 
 Backlog of known gaps. See `CLAUDE.md` for architecture and the Blender pipeline.
 
-## Done — expressive reactions (was items 1 & 2)
+## Done - expressive reactions (was items 1 & 2)
 
 - ✅ **Each action is unique & animated.** `logicalState` is now a 1:1 lookup via
   `Action.sprite`/`Emotion.sprite` (no more jump=cheer=celebrate / shake=panic
@@ -21,7 +21,7 @@ Backlog of known gaps. See `CLAUDE.md` for architecture and the Blender pipeline
 ## Backlog / next
 
 - **External inbound event API (redesign).** The first version was a loopback HTTP
-  server (`EventServer`, `127.0.0.1:51017`). **Removed** before release — a localhost
+  server (`EventServer`, `127.0.0.1:51017`). **Removed** before release - a localhost
   server is a poor fit for a shipped consumer app:
   - port conflicts (the chosen port may already be taken → silent failure),
   - any local webpage can `fetch()` localhost (CSRF-style abuse),
@@ -29,14 +29,14 @@ Backlog of known gaps. See `CLAUDE.md` for architecture and the Blender pipeline
   - generally an odd shape for a desktop toy.
 
   Pick a macOS-native, no-network mechanism instead (evaluate, then implement one):
-  - **`DistributedNotificationCenter`** — other apps post a named notification, Brick
+  - **`DistributedNotificationCenter`** - other apps post a named notification, Brick
     observes it. No port, no entitlement, multi-user safe. *Likely best.*
-  - **URL scheme** `lilcleo://event?type=…` — `open` from any script/app (needs a
+  - **URL scheme** `lilcleo://event?type=…` - `open` from any script/app (needs a
     proper `.app` bundle + Info.plist `CFBundleURLTypes`; SwiftPM exe alone can't
     register one).
   - **Watched folder / named pipe**, or a small `lilcleo event <type>` **CLI** that
     forwards to the running instance.
-  - **Push (APNs)** only if remote/cloud triggering is ever wanted — wrong fit for
+  - **Push (APNs)** only if remote/cloud triggering is ever wanted - wrong fit for
     local "system is hot" events.
   The reaction layer (`CleoEvent.react`) is already decoupled, so any transport just
   needs to parse → call `engine.react(...)`.

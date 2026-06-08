@@ -79,7 +79,7 @@ def _merge(*ds):
 
 
 def author_all(arm):
-    # ============================ TIER 0 — core ============================
+    # ============================ TIER 0 - core ============================
     still(arm, "idle", ARMS_DOWN)
     still(arm, "happy", _merge({"armL": (0, 0, -14), "armR": (0, 0, 14)},
                                {"head": (-3, 0, 0)}))
@@ -88,7 +88,7 @@ def author_all(arm):
     still(arm, "sad", _merge({"armL": (6, 0, -5), "armR": (6, 0, 5)},
                              {"spine": (12, 0, 0), "head": (18, 0, 0)}))
 
-    # walk — side travel, arms+legs counter-swing (8 keys over 1..8, looping)
+    # walk - side travel, arms+legs counter-swing (8 keys over 1..8, looping)
     sw = 32   # leg swing amplitude
     aw = 22   # arm swing amplitude
     walk_keys = []
@@ -101,7 +101,7 @@ def author_all(arm):
         }))
     cyc(arm, "walk", walk_keys)
 
-    # run — EXAGGERATED sprint: deep forward lean, big stride, hard-pumping bent
+    # run - EXAGGERATED sprint: deep forward lean, big stride, hard-pumping bent
     # arms, pronounced airborne bob. Reads unmistakably as "running", not walking.
     sw, aw = 62, 52
     run_keys = []
@@ -115,7 +115,7 @@ def author_all(arm):
         }))
     cyc(arm, "run", run_keys)
 
-    # wave — animated: the raised arm swings side to side (a real hello).
+    # wave - animated: the raised arm swings side to side (a real hello).
     cyc(arm, "wave", [
         (1, _merge({"armL": (-20, 0, -150), "armR": (0, 0, 7)}, {"head": (0, 9, 0)})),
         (2, _merge({"armL": (-20, 0, -108), "armR": (0, 0, 7)}, {"head": (0, 4, 0)})),
@@ -125,7 +125,7 @@ def author_all(arm):
         {"legL": (-86, 0, 4), "legR": (-86, 0, -4),
          "armL": (-14, 0, -20), "armR": (-14, 0, 20)},
         {"root_loc": (0, 0, -0.62)}))
-    # celebrate — animated: a big two-footed hop with arms in a victory V.
+    # celebrate - animated: a big two-footed hop with arms in a victory V.
     cyc(arm, "celebrate", [
         (1, _merge(ARMS_UP_V, {"head": (-6, 0, 0), "legL": (-10, 0, 0),
                                "legR": (10, 0, 0), "root_loc": (0, 0, 0.0)})),
@@ -133,7 +133,7 @@ def author_all(arm):
                                "legR": (-26, 0, 0), "root_loc": (0, 0, 0.42)})),  # bigger hop
         (3, _merge(ARMS_UP_V, {"head": (-6, 0, 0), "legL": (-10, 0, 0),
                                "legR": (10, 0, 0), "root_loc": (0, 0, 0.0)}))])
-    # panic — animated: arms thrown overhead, flailing left/right, head shaking.
+    # panic - animated: arms thrown overhead, flailing left/right, head shaking.
     cyc(arm, "panic", [
         (1, _merge({"armL": (-150, 0, -34), "armR": (-150, 0, 34)},
                    {"head": (-12, 0, -9), "spine": (-6, 0, 0)})),
@@ -147,7 +147,7 @@ def author_all(arm):
         {"armL": (6, 0, -10), "armR": (6, 0, 10)},
         {"head": (26, 0, 16), "spine": (6, 0, 0)}))
 
-    # ====================== TIER 1 — extended emotions =====================
+    # ====================== TIER 1 - extended emotions =====================
     still(arm, "neutral", ARMS_STRAIT)
     still(arm, "smiling", ARMS_DOWN)
     still(arm, "laughing", _merge({"armL": (8, 0, -16), "armR": (8, 0, 16)},
@@ -180,7 +180,7 @@ def author_all(arm):
     still(arm, "relieved", _merge({"armL": (-110, 0, 36), "armR": (6, 0, 10)},
                                   {"spine": (-8, 0, 0), "head": (-8, 0, 6)}))
 
-    # ====================== TIER 2 — gestures =====================
+    # ====================== TIER 2 - gestures =====================
     cyc(arm, "clap", [
         (1, {"armL": (-70, 0, 18), "armR": (-70, 0, -18)}),
         (2, {"armL": (-70, 0, 40), "armR": (-70, 0, -40)}),
@@ -207,7 +207,7 @@ def author_all(arm):
     still(arm, "yawn", _merge({"armL": (-150, 0, -20), "armR": (-150, 0, 20)},
                               {"head": (-18, 0, 0)}))
     still(arm, "peace", {"armL": (-150, 0, -16), "armR": (0, 0, 7)})
-    # fistpump — animated: the fist drives up and down ("yes!").
+    # fistpump - animated: the fist drives up and down ("yes!").
     cyc(arm, "fistpump", [
         (1, {"armL": (-150, 0, -6), "armR": (10, 0, 24)}),
         (2, {"armL": (-92, 0, -6), "armR": (10, 0, 24)}),
@@ -215,20 +215,20 @@ def author_all(arm):
     still(arm, "salute", _merge({"armL": (-118, 0, 14), "armR": (0, 0, 7)},
                                 {"head": (-4, 0, 0)}))
 
-    # ====================== TIER 3 — locomotion extras =====================
+    # ====================== TIER 3 - locomotion extras =====================
     cyc(arm, "jump", [
         (1, _merge({"legL": (-26, 0, 0), "legR": (-26, 0, 0),
                     "armL": (24, 0, -10), "armR": (24, 0, 10)},
                    {"root_loc": (0, 0, -0.26)})),                 # deep crouch
         (2, _merge(ARMS_UP_FWD, {"legL": (18, 0, 0), "legR": (18, 0, 0),
-                                 "root_loc": (0, 0, 0.55)})),     # airborne — feet off the ground
+                                 "root_loc": (0, 0, 0.55)})),     # airborne - feet off the ground
         (3, _merge({"legL": (-20, 0, 0), "legR": (-20, 0, 0),
                     "armL": (12, 0, -10), "armR": (12, 0, 10)},
                    {"root_loc": (0, 0, -0.08)}))])
 
-    # ====================== TIER 4 — prop / effect poses =====================
+    # ====================== TIER 4 - prop / effect poses =====================
     # body poses; props + effects are toggled by render_states.py per state.
-    # hairfire — animated: arms flail overhead in alarm while the head shakes.
+    # hairfire - animated: arms flail overhead in alarm while the head shakes.
     cyc(arm, "hairfire", [
         (1, _merge({"armL": (-62, 0, -72), "armR": (-62, 0, 72)},
                    {"head": (-8, 0, -7), "spine": (-4, 0, 0)})),
@@ -256,12 +256,12 @@ def author_all(arm):
     still(arm, "loading", _merge(ARMS_DOWN, {"head": (-4, 0, 0)}))
     still(arm, "sweating", _merge({"armL": (10, 0, -16), "armR": (-20, 0, 30)},
                                   {"head": (6, 0, 8), "spine": (6, 0, 0)}))
-    # meditate — calm STANDING zen pose (rigid minifig legs can't cross cleanly,
+    # meditate - calm STANDING zen pose (rigid minifig legs can't cross cleanly,
     # so we keep feet planted) with open palms out to the sides + sleepy face.
     still(arm, "meditate", _merge(
         {"armL": (-16, 0, -54), "armR": (-16, 0, 54)},
         {"head": (-2, 0, 0)}))
-    # clipboard — hold the board forward at chest (so it faces the camera), other
+    # clipboard - hold the board forward at chest (so it faces the camera), other
     # hand resting on it.
     still(arm, "clipboard", {"armL": (-46, 0, 12), "armR": (-64, 0, 20)})
 

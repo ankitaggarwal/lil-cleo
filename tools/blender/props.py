@@ -23,7 +23,7 @@ def _mat(n, c, **kw):
 
 
 # ===========================================================================
-# FACES  — each face is one joined object "Face_<name>" of black decals
+# FACES  - each face is one joined object "Face_<name>" of black decals
 # ===========================================================================
 def _dot(bm, x, z, r=0.058, sy=0.42):
     g = bmesh.new()
@@ -164,7 +164,7 @@ def build_props():
     props = []   # (objname, bone)
 
     yellow = _mat("Yellow", "yellow")
-    # --- coffee mug (armL hand) — a big-but-clean cup held in front (the pose
+    # --- coffee mug (armL hand) - a big-but-clean cup held in front (the pose
     # "coffee" in animate.py presents it forward at chest height so it never
     # overlaps the face). ---
     mugC = (WL.x, WL.y - 0.05)
@@ -178,7 +178,7 @@ def build_props():
     _steam("MugSteam", Vector((WL.x, WL.y - 0.05, WL.z + 0.54)))
     props += [("Mug", "armL"), ("MugSteam", "armL")]
 
-    # --- lightbulb idea (above head, centred) — bigger, brighter ---
+    # --- lightbulb idea (above head, centred) - bigger, brighter ---
     L.sphere("Bulb", 0.27, (0, FY - 0.10, HEAD_TOP + 0.46),
              _mat("BulbGlow", "white", emit="#FFF1B0", emit_str=4.5))
     L.cyl("BulbBase", 0.13, 0, 0.12, _mat("Steel", "steel", metallic=0.8),
@@ -256,7 +256,7 @@ def build_props():
     L.join_into("HpBand", ["HpBand", "HpCupL", "HpCupR"], rename="Headphones")
     props += [("Headphones", "head")]
 
-    # --- book (between hands) reading — a BIG open book ---
+    # --- book (between hands) reading - a BIG open book ---
     bz = L.TORSO_Z0 + 0.46      # chest height, matches the reading hand pose
     by = FY - 0.30
     L.box_rot("BookL", 0.19, by, bz, 0.38, 0.06, 0.50, _mat("BookCover", "red"), rz=-14)
@@ -274,7 +274,7 @@ def build_props():
     L.join_into("LapBase", ["LapBase", "LapScreen"], rename="Laptop")
     props += [("Laptop", "spine")]
 
-    # --- clipboard (armL) — bigger board facing forward ---
+    # --- clipboard (armL) - bigger board facing forward ---
     L.box("Clip", WL.x + 0.02, WL.y - 0.16, WL.z + 0.18, 0.36, 0.03, 0.48,
           _mat("ClipBrown", "#7A5A33"))
     L.box("ClipPaper", WL.x + 0.02, WL.y - 0.18, WL.z + 0.20, 0.30, 0.02, 0.40,
@@ -307,14 +307,14 @@ def build_props():
     flame = _mat("Flame", "#FF6A0A", emit="#FF6A0A", emit_str=3.0)
     flameY = _mat("FlameY", "#FFC21E", emit="#FFC21E", emit_str=4.0)
     fnames = []
-    # (dx, dy, height, radius) — a wide fan of tall tongues, center tallest. Heights
+    # (dx, dy, height, radius) - a wide fan of tall tongues, center tallest. Heights
     # tuned to stay just inside the 512x640 frame (no clipped tips).
     for i, (dx, dy, h, r) in enumerate([
             (0.0, 0.02, 0.86, 0.22), (0.27, 0.0, 0.66, 0.17),
             (-0.27, 0.03, 0.70, 0.17), (0.15, -0.12, 0.58, 0.14),
             (-0.15, -0.10, 0.54, 0.13), (0.40, 0.02, 0.44, 0.11),
             (-0.40, 0.02, 0.46, 0.11)]):
-        # outer red base, mid orange, inner yellow core — layered for depth.
+        # outer red base, mid orange, inner yellow core - layered for depth.
         L.cone(f"_flo{i}", r, 0.0, HEAD_TOP - 0.10, HEAD_TOP + h, flameR)
         L.PARTS[f"_flo{i}"].location = (dx, dy, 0)
         L.cone(f"_fl{i}", r * 0.72, 0.0, HEAD_TOP - 0.06, HEAD_TOP + h * 0.92, flame)

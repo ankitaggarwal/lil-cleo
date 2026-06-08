@@ -122,7 +122,7 @@ extension Action {
         case .panic:
             var p = Pose()
             let f = sin(phase * twoPi)
-            // hands thrown up beside the head, elbows bent — frantic, NOT a clean
+            // hands thrown up beside the head, elbows bent - frantic, NOT a clean
             // victory V (that's cheer). Plus a fast body jitter.
             p.shoulderL = -128 + 22 * f; p.shoulderR = 128 + 22 * f
             p.elbowL = -58; p.elbowR = 58

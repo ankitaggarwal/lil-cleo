@@ -1,7 +1,7 @@
 # Character pipeline
 
 How Brick (and any future 3D character) goes from a Blender rig to the sprite
-frames the app renders. Everything is self-contained under `tools/blender/` — no
+frames the app renders. Everything is self-contained under `tools/blender/` - no
 external services or downloads.
 
 ```
@@ -13,10 +13,10 @@ Run it all with `make brick` (≈40s), or step by step (`make brick-build`,
 `brick-walk`, `brick-render`, `brick-contact`). Requires Blender 4.5+/5.x at
 `/Applications/Blender.app` (override with `BLENDER=...`).
 
-## 1. Rig + poses — `build_brick.py`
+## 1. Rig + poses - `build_brick.py`
 
-Builds the minifig mesh (`bricklib.py`) and a 7-bone armature — `root, spine,
-head, armL, armR, legL, legR` — with LEGO parts **rigidly bone-parented** (they
+Builds the minifig mesh (`bricklib.py`) and a 7-bone armature - `root, spine,
+head, armL, armR, legL, legR` - with LEGO parts **rigidly bone-parented** (they
 rotate at joints, they don't skin-deform). Then:
 
 - `animate.py` authors every pose as a named **Action** (bone-local Euler
@@ -31,7 +31,7 @@ Output: `tools/blender/brick.blend` (committed, ~300 KB).
 mapping in `brick_states.py` if it needs new art), add the state name to the
 `FRONT` list in `render_states.py`, then `make brick`.
 
-## 2. Walk — real motion capture — `import_bvh.py`
+## 2. Walk - real motion capture - `import_bvh.py`
 
 The walk is **not** hand-keyed; it's a CMU mocap clip retargeted onto the rig.
 
@@ -43,7 +43,7 @@ The walk is **not** hand-keyed; it's a CMU mocap clip retargeted onto the rig.
   - **Legs:** source X → Brick `rx` (fore/aft swing). Both rigs rest legs-down, so
     this maps cleanly.
   - **Arms/head:** source Z/X → Brick `rx`, but **mean-subtracted** ("dynamic"
-    mode) — CMU rests arms held out sideways while Brick's hang down, so only the
+    mode) - CMU rests arms held out sideways while Brick's hang down, so only the
     *oscillation* transfers; copying the raw delta would fold the arms through the
     body.
 - `--loop 8`: autocorrelation finds one gait period (~128 frames at 120 fps) and
@@ -55,7 +55,7 @@ Re-deriving from a different clip: drop a `.bvh` in `mocap/` and
 `blender -b tools/blender/brick.blend -P tools/blender/import_bvh.py -- --bvh <file> --name walk --loop 8 --save`.
 Tune `AXIS_REMAP`/`DYNAMIC`/`GAIN` at the top of `import_bvh.py` per source rig.
 
-## 3. Render — `render_states.py`
+## 3. Render - `render_states.py`
 
 For each state, sets the Action, toggles the right face/props, and renders a
 transparent PNG into `Sources/LilCleo/Resources/characters/<id>/`:
