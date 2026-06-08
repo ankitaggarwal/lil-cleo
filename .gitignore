@@ -1,0 +1,28 @@
+# Build
+.build/
+.swiftpm/
+*.xcodeproj
+.DS_Store
+
+# Packaging output (built with `make app` / `make dmg`)
+dist/
+*.app
+*.dmg
+
+# Secrets (never commit)
+.env
+
+# Local agent / dev tooling — not part of the project, never published
+CLAUDE.md
+CLAUDE.local.md
+.mcp.json
+.claude/
+
+# Blender backups / scratch (the committed rig is tools/blender/brick.blend)
+tools/blender/work/
+*.blend1
+__pycache__/
+
+# Local launcher + logs
+run_lilcleo.command
+*.log
