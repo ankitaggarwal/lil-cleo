@@ -27,6 +27,15 @@ final class SystemMonitor {
     private var prevCPU: host_cpu_load_info?
     private var cpuHotStreak = 0
     private var cpuHot = false
+    // RAM pressure decays instead of latching: a warning/critical event keeps it
+    // "pressured" only while fresh events keep arriving. We can't poll for recovery —
+    // `kern…vm_pressure_level` stays at "warning" for minutes as the compressor drains
+    // slowly, so a level poll would pin Brick on fire long after the load is gone.
+    private static let memHold: TimeInterval = 30
+    private var memPressuredUntil = Date.distantPast
+    private var memPressured: Bool { Date() < memPressuredUntil }
+    private var lastCPUPct = 0         // last sampled CPU%, for the overload bubble copy
+    private var onFire = false         // sustained "running on fire" overload is active
     private var thermalHot = false
     private var batteryLow = false
     private var diskLow = false
@@ -50,8 +59,9 @@ final class SystemMonitor {
         }
         netMonitor.start(queue: netQueue)
 
-        // Memory pressure: kernel tells us; no polling needed.
-        let src = DispatchSource.makeMemoryPressureSource(eventMask: [.warning, .critical], queue: .main)
+        // Memory pressure: kernel tells us; no polling needed. We also listen for
+        // `.normal` so we know when RAM has recovered and the fire can go out.
+        let src = DispatchSource.makeMemoryPressureSource(eventMask: [.warning, .critical, .normal], queue: .main)
         src.setEventHandler { [weak self] in
             guard let self else { return }
             let ev = src.mask
@@ -91,14 +101,42 @@ final class SystemMonitor {
 
     private func checkCPU() {
         guard let usage = cpuUsage() else { return }
+        lastCPUPct = Int((usage * 100).rounded())
         if usage > 0.88 { cpuHotStreak += 1 } else { cpuHotStreak = 0 }
-        let hot = cpuHotStreak >= 2     // ~8 s sustained before we say anything
-        if hot && !cpuHot {
-            let pct = Int((usage * 100).rounded())
-            engine.trigger(emotion: .nervous, action: .sweating,
-                           message: "CPU's slammed — \(pct)% 🥵", hold: 3.0, intensity: .alert)
+        cpuHot = cpuHotStreak >= 2      // ~8 s sustained before we say anything
+        evaluateOverload()
+    }
+
+    // MARK: Overload — CPU and/or RAM pegged: run on fire until *both* recover
+
+    /// Single source of truth for the "running on fire" state, fed by both the CPU
+    /// poll and the (event-driven) memory-pressure handler. Brick ignites on the
+    /// rising edge, keeps panicking while either signal is hot, and only calms down
+    /// once CPU **and** RAM have both recovered.
+    private func evaluateOverload() {
+        guard settings.reactToSystem else { return }
+        let overloaded = cpuHot || memPressured
+        if overloaded {
+            let msg = overloadMessage()
+            if !onFire {
+                onFire = true
+                engine.beginEmergency(message: msg)
+            } else {
+                engine.sustainEmergency(message: msg)   // keep it alive between polls
+            }
+        } else if onFire {
+            onFire = false
+            engine.endEmergency(message: "phew — back to normal 😮‍💨")
         }
-        cpuHot = hot
+    }
+
+    /// Bubble copy describing *what* is on fire (CPU, RAM, or both).
+    private func overloadMessage() -> String {
+        switch (cpuHot, memPressured) {
+        case (true, true):  return "CPU \(lastCPUPct)% & RAM maxed — 🔥🔥"
+        case (true, false): return "CPU's slammed — \(lastCPUPct)% 🔥"
+        default:            return "memory's maxed out — 🔥"
+        }
     }
 
     private func cpuUsage() -> Double? {
@@ -185,13 +223,15 @@ final class SystemMonitor {
 
     private func handleMemory(_ ev: DispatchSource.MemoryPressureEvent) {
         guard settings.reactToSystem else { return }
-        if ev.contains(.critical) {
-            engine.trigger(emotion: .scared, action: .panic,
-                           message: "memory's really tight! 😱", hold: 3.0, intensity: .critical)
-        } else if ev.contains(.warning) {
-            engine.trigger(emotion: .nervous, action: .sweating,
-                           message: "memory's filling up… 😅", hold: 2.6, intensity: .alert)
+        // A warning/critical event refreshes the pressure window so it joins CPU in the
+        // overload decision; it then decays on its own if no fresh events arrive (load
+        // gone). A `.normal` event, when it does come, clears it immediately.
+        if ev.contains(.warning) || ev.contains(.critical) {
+            memPressuredUntil = Date().addingTimeInterval(Self.memHold)
+        } else if ev.contains(.normal) {
+            memPressuredUntil = .distantPast
         }
+        evaluateOverload()
     }
 
     // MARK: Network (event-driven)

@@ -24,6 +24,23 @@ extension AppDelegate {
             return
         }
 
+        // Machine overloaded (CPU and/or RAM pegged): forget the calm state machine and
+        // bolt back and forth across the dock, hair ablaze, until both signals recover.
+        if emotions.inEmergency {
+            let w = characterWindow.frame.size.width
+            let (minX, maxX) = walkBounds(screen: screen, width: w)
+            let y = dockTopY(screen) - footInset
+            let speed = walkSpeed * 2.4
+            var nx = brickX + panicDir * speed
+            if nx <= minX { nx = minX; panicDir = 1 }
+            else if nx >= maxX { nx = maxX; panicDir = -1 }
+            emotions.facing = panicDir
+            emotions.setLocomotion(walking: true, running: true)
+            place(nx, y)
+            activity = .reacting   // when the fire's out, settle then resume strolling
+            return
+        }
+
         // Any real reaction interrupts what he's doing: stop, turn front, and emote
         // (a mood face only shows from the front — while walking he's in profile).
         if let t = emotions.lastReactionAt, t != lastReactionSeen {

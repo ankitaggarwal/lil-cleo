@@ -37,6 +37,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // Wander state: Brick strolls along the dock when he's in the mood.
     var wanderTimer: Timer?
     var walkDir: CGFloat = 1          // +1 right, -1 left
+    var panicDir: CGFloat = 1         // +1 right, -1 left — direction of the on-fire run
     var pauseFrames = 0               // >0 means standing still
     var walkSpeed: CGFloat { 1.1 * CGFloat(settings.scale) }
 

@@ -523,6 +523,11 @@ final class EmotionEngine: ObservableObject {
     /// sprite — so he can, say, *run* with his hair on fire (demo reel).
     @Published var hairOnFire = false
 
+    /// True while the machine is overloaded (CPU and/or RAM pegged). Brick bolts
+    /// back and forth with his hair ablaze and *stays* that way until both signals
+    /// recover. Read by the wander loop, which takes over locomotion while it's set.
+    @Published var inEmergency = false
+
     /// Locomotion state, driven by the window-level wander controller and read by
     /// the renderer for the walk cycle + horizontal flip.
     @Published var isWalking = false
@@ -650,6 +655,45 @@ final class EmotionEngine: ObservableObject {
         performingGesture = false
         isWalking = true
         withAnimationIfPossible { action = running ? .run : .walk }
+    }
+
+    // MARK: - Overload emergency (CPU/RAM pegged → run with hair on fire)
+
+    /// Enter the sustained "everything's on fire" panic: flames on, scared face, and
+    /// the wander loop takes over to run him back and forth. Held at critical
+    /// intensity so nothing trivial stomps it. Stays until `endEmergency()`.
+    func beginEmergency(message: String) {
+        gestureTask?.cancel()
+        performingGesture = false
+        inEmergency = true
+        hairOnFire = true
+        isWalking = true
+        lastReactionAt = Date()
+        hold(.critical, for: 5.0)
+        withAnimationIfPossible { emotion = .scared; action = .run }
+        say(message, for: 6)
+    }
+
+    /// Keep the panic alive while still overloaded so its bubble + intensity lock
+    /// never decay away between polls.
+    func sustainEmergency(message: String) {
+        guard inEmergency else { return }
+        hold(.critical, for: 5.0)
+        lastReactionAt = Date()
+        say(message, for: 6)
+    }
+
+    /// Leave the emergency once CPU *and* RAM have recovered: douse the flames, drop
+    /// the intensity lock, and breathe a relieved sigh on the way back to calm.
+    func endEmergency(message: String) {
+        guard inEmergency else { return }
+        inEmergency = false
+        hairOnFire = false
+        isWalking = false
+        lockIntensity = .ambient
+        lockedUntil = .distantPast
+        flash(.relieved, for: 2.5)
+        say(message, for: 3)
     }
 
     /// Set the looping locomotion from the wander loop. Ignored while a one-shot
