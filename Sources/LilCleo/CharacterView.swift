@@ -60,10 +60,10 @@ struct CharacterView: View {
         }
     }
 
-    // MARK: Heartbeat (blink + ambient drift)
+    // MARK: Heartbeat (blink; the ambient personality tick lives in AppDelegate
+    // so it runs regardless of which renderer is on screen)
 
     private func tickHeartbeat() {
-        emotions.tickAmbient()
         guard let base = emotion.blinkInterval else { return }
         sinceBlink += 0.2
         if sinceBlink >= base * emotions.blinkMultiplier { sinceBlink = 0; doBlink() }

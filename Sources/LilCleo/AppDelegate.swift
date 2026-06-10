@@ -36,10 +36,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // Wander state: Brick strolls along the dock when he's in the mood.
     var wanderTimer: Timer?
-    var walkDir: CGFloat = 1          // +1 right, -1 left
     var panicDir: CGFloat = 1         // +1 right, -1 left - direction of the on-fire run
-    var pauseFrames = 0               // >0 means standing still
     var walkSpeed: CGFloat { 1.1 * CGFloat(settings.scale) }
+
+    // Eased locomotion: he ambles to a chosen spot, lingers, then picks another.
+    var strollSpeed: CGFloat = 0      // current step length (pts/frame), eased up & down
+    var strollTargetX: CGFloat?       // where this leg is headed; nil → pick a new spot
+    var dwellUntil = Date.distantPast // standing pause between legs
+    var cruiseFactor: CGFloat = 1     // per-leg pace variation, so legs aren't metronomic
 
     // Cached dock-pill x-range (the centered icon strip), refreshed periodically.
     var dockRange: ClosedRange<CGFloat>?
@@ -59,6 +63,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var brickX: CGFloat = 0           // authoritative sub-pixel x of the character window
     var filming = false               // true while the scripted demo reel is playing
     private var updateTimer: Timer?   // daily GitHub-release update check
+    private var ambientTimer: Timer?  // 0.2 s personality tick (fidgets, drift-to-sleep)
 
     // Demo cycler: steps through every emotion + action on a timer (for showcasing).
     var demoTimer: Timer?
@@ -71,6 +76,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setupCharacterWindow()
         setupBubbleWindow()
         startWandering()
+        startAmbientTick()
         setupShowreelHotkey()
         let env = ProcessInfo.processInfo.environment
         let pinned = env["CLEO_ACTION"] != nil || env["CLEO_EMOTION"] != nil
@@ -152,6 +158,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func checkForUpdates() { UpdateChecker.check(silent: false) }
+
+    /// Drive the engine's ambient personality (fidgets, drift-to-sleep, energy
+    /// recovery) from here so it runs with BOTH renderers - it used to live in the
+    /// vector CharacterView's heartbeat, which the sprite path never creates.
+    /// 0.2 s is the cadence `tickAmbient`'s probabilities are tuned for.
+    private func startAmbientTick() {
+        let t = Timer(timeInterval: 0.2, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.emotions.tickAmbient() }
+        }
+        RunLoop.main.add(t, forMode: .common)
+        ambientTimer = t
+    }
 
     // MARK: Cleo's floating window
 

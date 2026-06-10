@@ -20,7 +20,9 @@ final class SystemMonitor {
 
     private var timer: Timer?
     private var memPressure: DispatchSourceMemoryPressure?
-    private let netMonitor = NWPathMonitor()
+    // Recreated on every start(): a cancelled NWPathMonitor can never be restarted,
+    // so reusing one instance would silently kill network reactions after a toggle.
+    private var netMonitor: NWPathMonitor?
     private let netQueue = DispatchQueue(label: "lilcleo.net")
 
     // Edge-detection state (so we react on change, not every poll).
@@ -53,18 +55,20 @@ final class SystemMonitor {
     func start() {
         stop()
         // Network: event-driven, reacts on connectivity flips.
-        netMonitor.pathUpdateHandler = { [weak self] path in
+        let net = NWPathMonitor()
+        net.pathUpdateHandler = { [weak self] path in
             let down = (path.status != .satisfied)
             Task { @MainActor in self?.handleNetwork(down: down) }
         }
-        netMonitor.start(queue: netQueue)
+        net.start(queue: netQueue)
+        netMonitor = net
 
         // Memory pressure: kernel tells us; no polling needed. We also listen for
         // `.normal` so we know when RAM has recovered and the fire can go out.
         let src = DispatchSource.makeMemoryPressureSource(eventMask: [.warning, .critical, .normal], queue: .main)
-        src.setEventHandler { [weak self] in
-            guard let self else { return }
-            let ev = src.mask
+        src.setEventHandler { [weak self, weak src] in
+            // `data` is the event that fired; `mask` is just what we registered for.
+            guard let self, let ev = src?.data else { return }
             Task { @MainActor in self.handleMemory(ev) }
         }
         src.resume()
@@ -82,7 +86,16 @@ final class SystemMonitor {
     func stop() {
         timer?.invalidate(); timer = nil
         memPressure?.cancel(); memPressure = nil
-        netMonitor.cancel()
+        netMonitor?.cancel(); netMonitor = nil
+        // Nothing is left watching for recovery once stopped - clear the overload
+        // edge state and put the fire out rather than leaving Brick ablaze forever.
+        prevCPU = nil
+        cpuHotStreak = 0; cpuHot = false
+        memPressuredUntil = .distantPast
+        if onFire {
+            onFire = false
+            engine.endEmergency(message: "phew - back to normal 😮‍💨")
+        }
     }
 
     // MARK: Poll

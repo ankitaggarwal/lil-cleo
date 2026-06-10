@@ -24,6 +24,12 @@ extension AppDelegate {
             return
         }
 
+        // The window is user-draggable; if it moved while we weren't placing it
+        // (a drag during a pause or corner nap), adopt the new x so he carries on
+        // from where he was dropped instead of teleporting back to the stale brickX.
+        let actualX = characterWindow.frame.origin.x
+        if abs(actualX - brickX.rounded()) > 1 { brickX = actualX }
+
         // Machine overloaded (CPU and/or RAM pegged): forget the calm state machine and
         // bolt back and forth across the dock, hair ablaze, until both signals recover.
         if emotions.inEmergency {
@@ -70,16 +76,10 @@ extension AppDelegate {
 
         case .toCorner:
             guard emotions.wantsToWander else { emotions.setLocomotion(walking: false); break }
-            let dir: CGFloat = (cornerTargetX >= brickX) ? 1 : -1
-            var nx = brickX + dir * walkSpeed
-            if abs(nx - cornerTargetX) <= max(walkSpeed, 1) {
-                nx = cornerTargetX
-                place(min(max(nx, minX), maxX), y)
-                enterRest(leftCorner: cornerTargetX <= minX + 1)
-            } else {
-                emotions.facing = dir
-                emotions.setLocomotion(walking: true)
-                place(min(max(nx, minX), maxX), y)
+            let target = min(max(cornerTargetX, minX), maxX)
+            if walkToward(target, y: y, minX: minX, maxX: maxX,
+                          cruise: walkSpeed, running: false) {
+                enterRest(leftCorner: target <= minX + 1)
             }
 
         case .resting:
@@ -101,20 +101,72 @@ extension AppDelegate {
         activity = .strolling
         strollEndsAt = Date().addingTimeInterval(seconds)
         runMode = false   // natural strolls walk; the menu's "Run" re-sets this
+        strollTargetX = nil
+        strollSpeed = 0
+        dwellUntil = .distantPast
     }
 
-    /// One frame of free pacing (with the occasional pause / about-face).
+    /// One frame of free ambling: walk to a chosen spot (eased in and out), linger
+    /// there a moment, then pick somewhere new. Destination-based movement reads as
+    /// intentional; the old constant-speed wall-bounce read as a screensaver.
     func strollStep(minX: CGFloat, maxX: CGFloat, y: CGFloat) {
-        if pauseFrames > 0 { pauseFrames -= 1; emotions.setLocomotion(walking: false); return }
-        if !runMode, Int.random(in: 0..<420) == 0 { pauseFrames = Int.random(in: 60...160); return }
-        let speed = walkSpeed * (runMode ? 2.4 : 1)
-        var nx = brickX + walkDir * speed
-        if nx <= minX { nx = minX; walkDir = 1 }
-        else if nx >= maxX { nx = maxX; walkDir = -1 }
-        else if Int.random(in: 0..<600) == 0 { walkDir *= -1 }
-        emotions.facing = walkDir
-        emotions.setLocomotion(walking: true, running: runMode)
-        place(nx, y)
+        if Date() < dwellUntil { emotions.setLocomotion(walking: false); return }
+        let target = min(max(strollTargetX ?? pickStrollTarget(minX: minX, maxX: maxX), minX), maxX)
+        strollTargetX = target
+        let cruise = walkSpeed * cruiseFactor * (runMode ? 2.4 : 1)
+        if walkToward(target, y: y, minX: minX, maxX: maxX, cruise: cruise, running: runMode) {
+            strollTargetX = nil
+            emotions.setLocomotion(walking: false)
+            // Linger between legs; now and then a longer "noticed something" stand.
+            let dwell = Int.random(in: 0..<6) == 0 ? Double.random(in: 3.5...6.0)
+                                                   : Double.random(in: 0.7...2.6)
+            dwellUntil = Date().addingTimeInterval(runMode ? dwell * 0.25 : dwell)
+        }
+    }
+
+    /// One eased step toward `target`: accelerate from rest (~0.6 s to cruise),
+    /// hold cruise, brake into the stop - and never about-face at speed (heading
+    /// the wrong way brakes to a halt first, then turns standing). Returns true
+    /// on arrival.
+    func walkToward(_ target: CGFloat, y: CGFloat, minX: CGFloat, maxX: CGFloat,
+                    cruise: CGFloat, running: Bool) -> Bool {
+        let dist = abs(target - brickX)
+        if dist <= max(strollSpeed, 1) {
+            strollSpeed = 0
+            place(target, y)
+            return true
+        }
+        let dir: CGFloat = (target > brickX) ? 1 : -1
+        let accel = cruise / 30
+        // Moving away from the target: bleed off speed along the old heading first.
+        if dir != emotions.facing, strollSpeed > accel {
+            strollSpeed = max(0, strollSpeed - accel * 2)
+            place(min(max(brickX + emotions.facing * strollSpeed, minX), maxX), y)
+            return false
+        }
+        // Ease out over the last stretch, ease in from rest, cruise in between.
+        let brakeDist = cruise * 18
+        let desired = dist < brakeDist ? max(cruise * dist / brakeDist, cruise * 0.25) : cruise
+        strollSpeed = min(desired, strollSpeed + accel)
+        emotions.facing = dir
+        emotions.setLocomotion(walking: true, running: running)
+        place(min(max(brickX + dir * strollSpeed, minX), maxX), y)
+        return false
+    }
+
+    /// Somewhere new to amble to: usually a modest hop, occasionally a long cross,
+    /// with the direction weighted toward open space so he doesn't hug an edge.
+    /// Each leg also gets its own pace (`cruiseFactor`).
+    func pickStrollTarget(minX: CGFloat, maxX: CGFloat) -> CGFloat {
+        cruiseFactor = CGFloat.random(in: 0.85...1.15)
+        let span = maxX - minX
+        guard span > 8 else { return minX }
+        let long = Int.random(in: 0..<5) == 0
+        let hop = span * (long ? CGFloat.random(in: 0.45...0.85)
+                               : CGFloat.random(in: 0.12...0.40))
+        let roomR = maxX - brickX, roomL = brickX - minX
+        let dir: CGFloat = CGFloat.random(in: 0..<max(roomL + roomR, 1)) < roomR ? 1 : -1
+        return min(max(brickX + dir * hop, minX), maxX)
     }
 
     /// Move Brick to `nx`, tracking the authoritative sub-pixel x in `brickX`.
