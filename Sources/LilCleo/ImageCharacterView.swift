@@ -160,9 +160,20 @@ struct ImageCharacterView: View {
         max(frameCount(character, "walk"), 1)
     }
 
+    /// Resource bundle that works inside a packaged .app. SwiftPM's generated
+    /// `Bundle.module` for executables only checks the .app root and the absolute
+    /// dev build path, so the bundle tools/package.sh places in Contents/Resources/
+    /// is invisible to it - look there first, fall back to `.module` for dev runs.
+    private static let appResources: Bundle = {
+        if let url = Bundle.main.resourceURL?
+            .appendingPathComponent("LilCleo_LilCleo.bundle"),
+           let bundle = Bundle(url: url) { return bundle }
+        return .module
+    }()
+
     /// Load a bundled sprite for a character + state.
     static func sprite(_ character: String, _ name: String) -> NSImage? {
-        let b = Bundle.module
+        let b = appResources
         let url = b.url(forResource: name, withExtension: "png", subdirectory: "characters/\(character)")
             ?? b.url(forResource: "characters/\(character)/\(name)", withExtension: "png")
         guard let url, let img = NSImage(contentsOf: url) else { return nil }

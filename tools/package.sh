@@ -5,16 +5,19 @@
 #   tools/package.sh app        # just the .app
 #   make app  /  make dmg
 #
-# The app is ad-hoc code-signed so it runs locally. It is NOT notarized (that needs
-# a paid Apple Developer ID), so on another Mac the first launch is right-click ▸
-# Open (or: xattr -dr com.apple.quarantine /Applications/LilCleo.app).
+# Signing: if a "Developer ID Application" identity is in the keychain, the app is
+# signed with it (hardened runtime) and the DMG is notarized + stapled via the
+# notarytool keychain profile "lilcleo" (xcrun notarytool store-credentials lilcleo).
+# Otherwise it falls back to ad-hoc signing - runs locally, but on another Mac the
+# first launch is right-click > Open (or: xattr -dr com.apple.quarantine ...).
+# Override the identity with LILCLEO_SIGN_ID.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 APP_NAME="LilCleo"
-VERSION="${LILCLEO_VERSION:-1.1.0}"
+VERSION="${LILCLEO_VERSION:-1.1.2}"
 BUNDLE_ID="com.curious.lilcleo"
 DIST="dist"
 APP="$DIST/$APP_NAME.app"
@@ -93,8 +96,15 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-echo "▸ Ad-hoc code sign"
-codesign --force --deep --sign - "$APP"
+SIGN_ID="${LILCLEO_SIGN_ID:-$(security find-identity -v -p codesigning 2>/dev/null \
+    | awk -F'"' '/Developer ID Application/ {print $2; exit}')}"
+if [ -n "$SIGN_ID" ]; then
+    echo "▸ Code sign ($SIGN_ID)"
+    codesign --force --options runtime --timestamp --sign "$SIGN_ID" "$APP"
+else
+    echo "▸ Ad-hoc code sign (no Developer ID identity in keychain)"
+    codesign --force --deep --sign - "$APP"
+fi
 echo "✓ Built $APP"
 
 if [ "$WHAT" = "app" ]; then exit 0; fi
@@ -107,3 +117,16 @@ ln -s /Applications "$STAGE/Applications"
 hdiutil create -volname "$APP_NAME" -srcfolder "$STAGE" -ov -format UDZO "$DIST/$APP_NAME.dmg" >/dev/null
 rm -rf "$STAGE"
 echo "✓ Built $DIST/$APP_NAME.dmg"
+
+if [ -n "$SIGN_ID" ]; then
+    codesign --force --timestamp --sign "$SIGN_ID" "$DIST/$APP_NAME.dmg"
+    if xcrun notarytool history --keychain-profile lilcleo >/dev/null 2>&1; then
+        echo "▸ Notarizing (takes a few minutes)"
+        xcrun notarytool submit "$DIST/$APP_NAME.dmg" --keychain-profile lilcleo --wait
+        xcrun stapler staple "$DIST/$APP_NAME.dmg"
+        echo "✓ Notarized + stapled"
+    else
+        echo "! Skipping notarization - no 'lilcleo' keychain profile."
+        echo "  Run: xcrun notarytool store-credentials lilcleo --apple-id <email> --team-id NC7UG754C6"
+    fi
+fi
